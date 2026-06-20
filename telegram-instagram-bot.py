@@ -11,6 +11,8 @@ import re
 import sys
 import time
 import logging
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 import requests
 import httpx
 from dotenv import load_dotenv
@@ -356,8 +358,32 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     )
 
 
+class HealthCheckHandler(BaseHTTPRequestHandler):
+    """Simple health check handler for Render.com port binding."""
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain")
+        self.end_headers()
+        self.wfile.write(b"Bot is running")
+
+    def log_message(self, format, *args):
+        pass  # Suppress noisy HTTP logs
+
+
+def start_health_server():
+    """Start a background HTTP server for Render.com health checks."""
+    port = int(os.getenv("PORT", "10000"))
+    server = HTTPServer(("0.0.0.0", port), HealthCheckHandler)
+    print(f"🌐 Health check server running on port {port}")
+    server.serve_forever()
+
+
 def main():
     """Start the bot."""
+    # Start health check server in background thread (for Render.com)
+    health_thread = threading.Thread(target=start_health_server, daemon=True)
+    health_thread.start()
+
     print("🤖 Starting Instagram Carousel Telegram Bot...")
     print(f"Bot Token: {TELEGRAM_BOT_TOKEN[:20]}...")
     print(f"Chat ID: {TELEGRAM_CHAT_ID}")
