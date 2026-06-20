@@ -53,7 +53,7 @@ URL_PATTERN = r'https?://[^\s]+'
 async def extract_urls(text: str) -> list:
     """Extract all URLs from text."""
     urls = re.findall(URL_PATTERN, text)
-    return urls[:4]  # Maximum 4 images for carousel
+    return urls[:10]  # Maximum 10 images for carousel
 
 
 def create_child_container(image_url: str) -> str:
@@ -197,8 +197,8 @@ async def post_to_instagram(image_urls: list, caption: str = "") -> dict:
             "error": "No valid image URLs provided"
         }
 
-    if len(image_urls) > 4:
-        image_urls = image_urls[:4]
+    if len(image_urls) > 10:
+        image_urls = image_urls[:10]
 
     try:
         # Step 1: Create child containers for each image
@@ -280,7 +280,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     if not image_urls:
         await update.message.reply_text(
             "❌ No image URLs found in your message.\n\n"
-            "Please send a message with 1-4 CDN image links, for example:\n"
+            "Please send a message with 1-10 CDN image links, for example:\n"
             "https://example.com/image1.jpg\n"
             "https://example.com/image2.jpg"
         )
@@ -327,7 +327,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     await update.message.reply_text(
         "👋 Welcome to Instagram Carousel Bot!\n\n"
         "📸 How to use:\n"
-        "1. Send me 1-4 CDN image links in a single message\n"
+        "1. Send me 1-10 CDN image links in a single message\n"
         "2. I'll post them as an Instagram carousel\n"
         "3. You'll receive the Instagram post link\n\n"
         "Example:\n"
@@ -347,7 +347,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "/start - Show welcome message\n"
         "/help - Show this help message\n\n"
         "Features:\n"
-        "✅ Post up to 4 images as Instagram carousel\n"
+        "✅ Post up to 10 images as Instagram carousel\n"
         "✅ Instant posting via Instagram Graph API\n"
         "✅ Automatic error handling\n"
         "✅ Instant confirmation with post link\n\n"
